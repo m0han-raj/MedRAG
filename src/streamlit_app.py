@@ -1,16 +1,14 @@
 import streamlit as st
+
 from interface import process_query
 
-if 'messages' not in st.session_state:
+if "messages" not in st.session_state:
     st.session_state.messages = []
 
-st.set_page_config(
-    page_title="Medplus",
-    page_icon="🔴",
-    layout="wide"
-)
+st.set_page_config(page_title="Medplus", page_icon="🔴", layout="wide")
 
-st.markdown("""
+st.markdown(
+    """
     <style>
     .main-container {
         display: flex;
@@ -163,24 +161,30 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 left_col, main_col, right_col = st.columns([1, 3, 1])
 
 with main_col:
     st.markdown('<p class="custom-title">Medplus</p>', unsafe_allow_html=True)
-    st.markdown('<p class="custom-subtitle">Your AI assistant for diabetes-related questions</p>', unsafe_allow_html=True)
-    
+    st.markdown(
+        '<p class="custom-subtitle">Your AI assistant for diabetes-related questions</p>',
+        unsafe_allow_html=True,
+    )
+
     chat_container = st.container()
-    
+
     with chat_container:
         for message in st.session_state.messages:
             role = message["role"]
             content = message["content"]
-            
+
             message_style = "user-message" if role == "user" else "assistant-message"
             avatar = "👤" if role == "user" else "🤖"
-            st.markdown(f"""
+            st.markdown(
+                f"""
                 <div class="chat-message {message_style}">
                     <div class="avatar {role}-avatar">{avatar}</div>
                     <div class="message-bubble {role}-bubble">
@@ -188,57 +192,70 @@ with main_col:
                         <div class="message-content">{content}</div>
                     </div>
                 </div>
-            """, unsafe_allow_html=True)
-            
+            """,
+                unsafe_allow_html=True,
+            )
+
     st.markdown("<br>" * 2, unsafe_allow_html=True)
     with st.container():
         st.markdown('<div class="input-container">', unsafe_allow_html=True)
         input_col, button_col = st.columns([6, 1])
-        
+
         with input_col:
-            user_question = st.text_input("", 
-                placeholder="Type your diabetes-related question here...", 
+            user_question = st.text_input(
+                "",
+                placeholder="Type your diabetes-related question here...",
                 key="user_input",
-                label_visibility="collapsed")
-        
+                label_visibility="collapsed",
+            )
+
         with button_col:
             send_button = st.button("Send", use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-            
+        st.markdown("</div>", unsafe_allow_html=True)
+
         if send_button and user_question:
             try:
-                st.session_state.messages.append({"role": "user", "content": user_question})
-                
-                with st.spinner('Thinking...'):
+                st.session_state.messages.append(
+                    {"role": "user", "content": user_question}
+                )
+
+                with st.spinner("Thinking..."):
                     response = process_query(user_question)
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": response}
+                )
+
                 st.rerun()
-                
+
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
 with st.sidebar:
     st.markdown("### 🔍 Quick Tips")
-    st.markdown("""
+    st.markdown(
+        """
     **Try asking about:**
     - Symptoms of diabetes
     - Risk factors
     - Diagnosis methods
     - Treatment options
     - Prevention strategies
-    """)
-    
+    """
+    )
+
     st.markdown("---")
-    
+
     if st.button("🗑️ Clear Chat", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
-    
+
     st.markdown("---")
-    st.markdown("""
+    st.markdown(
+        """
     <div style='font-size: 0.9rem; text-align: center; color: #888;'>
     Powered by Together AI and LangChain<br>
     🔒 Your conversations are private
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
